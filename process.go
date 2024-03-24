@@ -54,19 +54,18 @@ func Process(r io.Reader, w io.Writer) error {
 }
 
 func printResult(w io.Writer, data map[string]Data) {
-	result := make(map[string]Data, len(data))
-	keys := make([]string, 0, len(data))
+	result := make([]Data, 0, len(data))
 	for _, v := range data {
-		keys = append(keys, v.Name)
-		result[v.Name] = v
+		result = append(result, v)
 	}
-	sort.Strings(keys)
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Name < result[j].Name
+	})
 
 	_, _ = fmt.Fprint(w, "{")
-	for i, k := range keys {
-		v := result[k]
-		_, _ = fmt.Fprintf(w, "%s=%.1f/%.1f/%.1f", k, v.Min, v.Total/float64(v.Count), v.Max)
-		if i < len(keys)-1 {
+	for i, v := range result {
+		_, _ = fmt.Fprintf(w, "%s=%.1f/%.1f/%.1f", v.Name, v.Min, v.Total/float64(v.Count), v.Max)
+		if i < len(result)-1 {
 			_, _ = fmt.Fprint(w, ", ")
 		}
 	}
