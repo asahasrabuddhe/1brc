@@ -16,7 +16,7 @@ type Station struct {
 	Count int64
 }
 
-const BufferSize = 32 * 1024 * 1024
+const BufferSize = 16 * 1024 * 1024
 
 // Process reads the input data and returns the result
 func Process(r io.Reader, w io.Writer) error {
