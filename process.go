@@ -141,17 +141,13 @@ func parseLine(line []byte) ([]byte, int64) {
 }
 
 func printResult(w io.Writer, resultsCh <-chan map[string]*Station) {
-	results := make(map[string]*Station, 1024)
-	stations := make([]string, 0, 1024)
-	citiesMap := make(map[string]struct{}, 1024)
+	results := make(map[string]*Station, 512)
+	stations := make([]string, 0, 512)
 	for result := range resultsCh {
 		for k, data := range result {
 			if station, ok := results[k]; !ok {
 				results[k] = &Station{Min: data.Min, Max: data.Max, Total: data.Total, Count: 1}
-				if _, exists := citiesMap[k]; !exists {
-					stations = append(stations, k)
-					citiesMap[k] = struct{}{}
-				}
+				stations = append(stations, k)
 			} else {
 				station.Min = min(station.Min, data.Min)
 				station.Max = max(station.Max, data.Max)
