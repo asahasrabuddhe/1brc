@@ -171,8 +171,8 @@ func printResult(w io.Writer, resultsCh <-chan map[string]*Station) {
 }
 
 func byteIndex(src []byte, sep byte) int {
-	for i, c := range src {
-		if c == sep {
+	for i := len(src) - 1; i >= 0; i-- {
+		if src[i] == sep {
 			return i
 		}
 	}
