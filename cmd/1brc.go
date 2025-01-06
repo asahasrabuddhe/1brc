@@ -7,12 +7,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("/Users/ajitem/1brc/measurements-1b.txt")
-	if err != nil {
-		panic(err)
-	}
-
-	err = onebrc.Process(file, os.Stdout)
+	err := onebrc.Process("/Users/ajitem/1brc/measurements-1b.txt", os.Stdout)
 	if err != nil {
 		panic(err)
 	}
