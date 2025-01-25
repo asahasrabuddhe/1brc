@@ -9,11 +9,12 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: 1brc <filename>")
+	if len(os.Args) != 3 {
+		fmt.Println("Usage: 1brc <filename> <version>")
 	}
 
 	filename := os.Args[1]
+	version := os.Args[2]
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -25,17 +26,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	size := stat.Size()
+	size := stat.Size() / 1024 / 1024
 	now := time.Now()
 
-	p := onebrc.NewProcess()
+	p := onebrc.NewProcess(version)
 
 	err = p.Process(file, os.Stdout)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Proecssed %d MB in %s @ %d MB/s\n", size, time.Since(now), size/1024/1024)
+	timeElapsed := time.Since(now)
+	fmt.Printf("Proecssed %d MB in %s @ %.2f MB/s\n", size, timeElapsed.String(), float64(size)/timeElapsed.Seconds())
 
 	err = file.Close()
 	if err != nil {
