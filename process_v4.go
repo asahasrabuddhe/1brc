@@ -94,7 +94,7 @@ func (_ V4) Process(in *os.File, out io.Writer) error {
 		}
 		data := results[name]
 		mean := float64(data.Total) / float64(data.Count) / 10
-		fmt.Fprintf(out, "%s=%.2f/%.2f/%.2f", name, float64(data.Min)/10, mean, float64(data.Max)/10)
+		fmt.Fprintf(out, "%s=%.1f/%.1f/%.1f", name, float64(data.Min)/10, mean, float64(data.Max)/10)
 	}
 	fmt.Fprint(out, "}\n")
 	return nil

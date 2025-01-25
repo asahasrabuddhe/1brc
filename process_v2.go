@@ -49,7 +49,7 @@ func (_ V2) Process(in *os.File, out io.Writer) error {
 		}
 		data := results[name]
 		mean := data.Total / data.Count
-		fmt.Fprintf(out, "%s=%.2f/%.2f/%.2f", name, data.Min, mean, data.Max)
+		fmt.Fprintf(out, "%s=%.1f/%.1f/%.1f", name, data.Min, mean, data.Max)
 	}
 	fmt.Fprint(out, "}\n")
 	return nil
