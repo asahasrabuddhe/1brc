@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestV1_Process(t *testing.T) {
+func TestV2_Process(t *testing.T) {
 	type args struct {
 		filePath string
 	}
@@ -19,7 +19,7 @@ func TestV1_Process(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "TestV1_Process",
+			name: "TestV2_Process",
 			args: args{
 				filePath: "./testdata/measurements-10k.txt",
 			},
@@ -32,7 +32,7 @@ func TestV1_Process(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			p := V1{}
+			p := V2{}
 			out := &bytes.Buffer{}
 			err = p.Process(file, out)
 			if (err != nil) != tt.wantErr {
@@ -46,7 +46,7 @@ func TestV1_Process(t *testing.T) {
 	}
 }
 
-func BenchmarkProcessV1(b *testing.B) {
+func BenchmarkProcessV2(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
 		b.Error(err)
@@ -57,7 +57,7 @@ func BenchmarkProcessV1(b *testing.B) {
 	var out bytes.Buffer
 
 	for i := 0; i < b.N; i++ {
-		p := V1{}
+		p := V2{}
 		out := &bytes.Buffer{}
 		err = p.Process(file, out)
 		if err != nil {
