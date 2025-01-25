@@ -19,7 +19,7 @@ type DataV1 struct {
 
 type V1 struct{}
 
-func (p V1) Process(in *os.File, out io.Writer) error {
+func (_ V1) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV1)
 	stations := make([]string, 0)
 	scanner := bufio.NewScanner(in)
