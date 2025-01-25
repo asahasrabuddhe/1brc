@@ -58,8 +58,8 @@ func BenchmarkProcessV4(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		p := V4{}
-		out := &bytes.Buffer{}
-		err = p.Process(file, out)
+		out = bytes.Buffer{}
+		err = p.Process(file, &out)
 		if err != nil {
 			b.Error(err)
 		}
