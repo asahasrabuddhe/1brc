@@ -6,7 +6,7 @@ import (
 )
 
 // hashBucket implementation
-const numBuckets = 1 << 14 // number of hash buckets (power of 2)
+const numBuckets = 1 << 11 // number of hash buckets (power of 2)
 
 // item represents a key-value pair in the hashBucket.
 type item struct {
