@@ -44,9 +44,6 @@ func (_ V7) Process(in *os.File, out io.Writer) error {
 	// merge the results from the goroutines
 	for result := range resultsCh {
 		for h, i := range result.getItems() {
-			if i.value == nil {
-				continue
-			}
 			results.insertItem(i.key, uint64(h), i.value.Min, i.value.Max, i.value.Total, i.value.Count)
 		}
 	}
@@ -57,9 +54,6 @@ func (_ V7) Process(in *os.File, out io.Writer) error {
 	_, _ = fmt.Fprint(out, "{")
 	idx := 0
 	for _, itm := range results.getItems() {
-		if itm.value == nil {
-			continue
-		}
 		if idx > 0 {
 			_, _ = fmt.Fprint(out, ",")
 		}
