@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-const BufferSize = 1024
+const BufferSize = 32 * 1024 * 1024
 
 type V3 struct{}
 
