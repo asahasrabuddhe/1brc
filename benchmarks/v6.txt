@@ -1,0 +1,16 @@
+goos: darwin
+goarch: arm64
+pkg: onebrc
+cpu: Apple M1 Pro
+BenchmarkProcessV6-10    	       1	19600662792 ns/op	  676688 B/op	   10680 allocs/op
+BenchmarkProcessV6-10    	       1	19627711375 ns/op	  655848 B/op	   10660 allocs/op
+BenchmarkProcessV6-10    	       1	19648462584 ns/op	  660920 B/op	   10670 allocs/op
+BenchmarkProcessV6-10    	       1	19532924833 ns/op	  651752 B/op	   10662 allocs/op
+BenchmarkProcessV6-10    	       1	19464206375 ns/op	  651480 B/op	   10663 allocs/op
+BenchmarkProcessV6-10    	       1	19388104958 ns/op	  650440 B/op	   10658 allocs/op
+BenchmarkProcessV6-10    	       1	19233740083 ns/op	  650280 B/op	   10648 allocs/op
+BenchmarkProcessV6-10    	       1	19280187542 ns/op	  661656 B/op	   10662 allocs/op
+BenchmarkProcessV6-10    	       1	19204873750 ns/op	  650440 B/op	   10658 allocs/op
+BenchmarkProcessV6-10    	       1	18875979625 ns/op	  663496 B/op	   10661 allocs/op
+PASS
+ok  	onebrc	194.309s
