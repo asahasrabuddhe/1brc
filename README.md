@@ -43,3 +43,7 @@ Between `v1` and `v7`, I managed to achieve:
 * More than 100% drop in allocations from 2GB per operation to just 11kb per operation.
 
 It is really pleasing to see how much performance can be gained by careful optimisations which are possible to all the great tools that Go includes as a part of the standard installation.
+
+## NOTE
+
+All the benchmarks are done on the 2021 M1 Pro Macbook Pro with 16GB of RAM.
