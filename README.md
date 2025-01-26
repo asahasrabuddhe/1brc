@@ -17,6 +17,7 @@ This is my attempt of the famous [challenge](https://github.com/gunnarmorling/1b
 Detailed benchmarks are included in the `benchmarks` folder.
 
 ## Running the program
+This program expects the input file to be present in the `testdata` folder. Please copy-paste the same to the `testdata` folder or create a symlink. You can then use the following command to run the program:
 
 ```bash
 make run VERSION=<version>
