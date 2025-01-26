@@ -82,64 +82,68 @@ type metadata struct {
 }
 
 func splitChunks(filePath string, numChunks int) ([]metadata, error) {
-	// open the file
+	// Open the file
 	f, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	// get the file size
+	// Get the file size
 	st, err := f.Stat()
 	if err != nil {
 		return nil, err
 	}
 	size := st.Size()
 
-	// calculate the chunk size
+	// Calculate the ideal chunk size
 	chunkSize := size / int64(numChunks)
+	if chunkSize == 0 {
+		return nil, fmt.Errorf("chunk size too small for the number of chunks")
+	}
 
-	// buffer to hold the data near the boundary of each chunk
-	buf := make([]byte, maxLineLength)
-	// slice to store the chunk info
+	// Slice to store chunk metadata
 	chunks := make([]metadata, 0, numChunks)
-	// offset tracks the start of the current chunk
 	offset := int64(0)
+	buf := make([]byte, maxLineLength)
 
 	for i := 0; i < numChunks; i++ {
-		// handle the last chunk
-		if i == numChunks-1 {
-			if offset < size {
-				chunks = append(chunks, metadata{offset, size - offset})
-			}
+		if offset >= size {
 			break
 		}
 
-		// seek near the end of the current chunk
-		seekOffset := max(offset+chunkSize-maxLineLength, 0)
+		// Calculate the target end of the chunk
+		end := offset + chunkSize
+		if i == numChunks-1 || end >= size {
+			// Handle the last chunk
+			chunks = append(chunks, metadata{offset, size - offset})
+			break
+		}
+
+		// Seek to the target offset, minus a buffer to find the nearest newline
+		seekOffset := max(end-maxLineLength, 0)
 		_, err = f.Seek(seekOffset, io.SeekStart)
 		if err != nil {
 			return nil, err
 		}
 
-		// read the data near the boundary of the chunk
-		n, err := io.ReadFull(f, buf)
-		if err != nil && !errors.Is(err, io.ErrUnexpectedEOF) {
+		// Read up to `maxLineLength` bytes
+		n, err := f.Read(buf)
+		if err != nil && !errors.Is(err, io.EOF) {
 			return nil, err
 		}
-		chunk := buf[:n]
 
-		// find the newline in the chunk
-		newline := lastByteIndex(chunk, '\n')
+		// Find the nearest newline
+		newline := lastByteIndex(buf[:n], '\n')
 		if newline < 0 {
-			return nil, fmt.Errorf("newline not found in the chunk")
+			return nil, fmt.Errorf("newline not found in buffer near offset %d", seekOffset)
 		}
 
-		// calculate the next offset
+		// Adjust the chunk boundary to the newline
 		nextOffset := seekOffset + int64(newline) + 1
-		// add the chunk info to the slice
 		chunks = append(chunks, metadata{offset, nextOffset - offset})
-		// update the offset
+
+		// Update the offset for the next chunk
 		offset = nextOffset
 	}
 
