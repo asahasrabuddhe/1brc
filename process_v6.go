@@ -11,11 +11,11 @@ import (
 	"sync"
 )
 
-type V5 struct{}
+type V6 struct{}
 
-func (_ V5) Process(in *os.File, out io.Writer) error {
-	results := make(map[string]DataV4)
-	resultsCh := make(chan map[string]DataV4)
+func (_ V6) Process(in *os.File, out io.Writer) error {
+	results := make(map[string]*DataV4)
+	resultsCh := make(chan map[string]*DataV4)
 	stations := make([]string, 0)
 	chunks, err := splitChunks(in.Name(), runtime.NumCPU())
 	if err != nil {
@@ -27,7 +27,7 @@ func (_ V5) Process(in *os.File, out io.Writer) error {
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV5(in.Name(), chunk, resultsCh, &chunkWg)
+		go processChunkV6(in.Name(), chunk, resultsCh, &chunkWg)
 	}
 
 	// wait for all the goroutines to finish
@@ -40,7 +40,7 @@ func (_ V5) Process(in *os.File, out io.Writer) error {
 	for result := range resultsCh {
 		for name, value := range result {
 			if station, ok := results[name]; !ok {
-				results[name] = DataV4{
+				results[name] = &DataV4{
 					Min:   value.Min,
 					Max:   value.Max,
 					Total: value.Total,
@@ -52,8 +52,6 @@ func (_ V5) Process(in *os.File, out io.Writer) error {
 				station.Max = max(value.Max, station.Max)
 				station.Total += value.Total
 				station.Count += value.Count
-
-				results[name] = station
 			}
 		}
 	}
@@ -72,81 +70,7 @@ func (_ V5) Process(in *os.File, out io.Writer) error {
 	return nil
 }
 
-// read chunks implementation
-const maxLineLength = 100
-
-// metadata represents the chunk offset and size
-type metadata struct {
-	offset int64
-	size   int64
-}
-
-func splitChunks(filePath string, numChunks int) ([]metadata, error) {
-	// open the file
-	f, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	// get the file size
-	st, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	size := st.Size()
-
-	// calculate the chunk size
-	chunkSize := size / int64(numChunks)
-
-	// buffer to hold the data near the boundary of each chunk
-	buf := make([]byte, maxLineLength)
-	// slice to store the chunk info
-	chunks := make([]metadata, 0, numChunks)
-	// offset tracks the start of the current chunk
-	offset := int64(0)
-
-	for i := 0; i < numChunks; i++ {
-		// handle the last chunk
-		if i == numChunks-1 {
-			if offset < size {
-				chunks = append(chunks, metadata{offset, size - offset})
-			}
-			break
-		}
-
-		// seek near the end of the current chunk
-		seekOffset := max(offset+chunkSize-maxLineLength, 0)
-		_, err = f.Seek(seekOffset, io.SeekStart)
-		if err != nil {
-			return nil, err
-		}
-
-		// read the data near the boundary of the chunk
-		n, err := io.ReadFull(f, buf)
-		if err != nil && !errors.Is(err, io.ErrUnexpectedEOF) {
-			return nil, err
-		}
-		chunk := buf[:n]
-
-		// find the newline in the chunk
-		newline := lastByteIndex(chunk, '\n')
-		if newline < 0 {
-			return nil, fmt.Errorf("newline not found in the chunk")
-		}
-
-		// calculate the next offset
-		nextOffset := seekOffset + int64(newline) + 1
-		// add the chunk info to the slice
-		chunks = append(chunks, metadata{offset, nextOffset - offset})
-		// update the offset
-		offset = nextOffset
-	}
-
-	return chunks, nil
-}
-
-func processChunkV5(filePath string, md metadata, resultsCh chan map[string]DataV4, wg *sync.WaitGroup) {
+func processChunkV6(filePath string, md metadata, resultsCh chan map[string]*DataV4, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	file, err := os.Open(filePath)
@@ -161,7 +85,7 @@ func processChunkV5(filePath string, md metadata, resultsCh chan map[string]Data
 	}
 
 	reader := io.LimitReader(file, md.size)
-	results := make(map[string]DataV4)
+	results := make(map[string]*DataV4)
 
 	buf := make([]byte, BufferSize)
 	readStart := 0
@@ -219,7 +143,7 @@ func processChunkV5(filePath string, md metadata, resultsCh chan map[string]Data
 				tempInt = -tempInt
 			}
 			if station, ok := results[string(stationName)]; !ok {
-				results[string(stationName)] = DataV4{
+				results[string(stationName)] = &DataV4{
 					Min:   tempInt,
 					Max:   tempInt,
 					Total: tempInt,
@@ -230,8 +154,6 @@ func processChunkV5(filePath string, md metadata, resultsCh chan map[string]Data
 				station.Max = max(tempInt, station.Max)
 				station.Total += tempInt
 				station.Count++
-
-				results[string(stationName)] = station
 			}
 		}
 		readStart = copy(buf, remaining)
