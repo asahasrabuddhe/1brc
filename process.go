@@ -23,6 +23,8 @@ func NewProcess(version string) Process {
 		return V5{}
 	case "v6":
 		return V6{}
+	case "v7":
+		return V7{}
 	default:
 		panic("invalid version")
 	}
