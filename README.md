@@ -13,7 +13,7 @@ This is my attempt of the famous [challenge](https://github.com/gunnarmorling/1b
 |v5|11s| Process file concurrently in chunks                                               |
 |v6|5.7s| Reduce `map` access by using pointers.                                            |
 |v7|3.2s| Replace `map` with a custom hash bucket using the `fnv` hash                      |
-
+|v8|3.08s| Use PGO to generate optimised binary.                                             | 
 Detailed benchmarks are included in the `benchmarks` folder.
 
 ## Running the program
@@ -33,13 +33,13 @@ make test
 make bench VERSION=<version>
 ```
 
-`<version>` accepts a valid version number between `v1` and `v7`.
+`<version>` accepts a valid version number between `v1` and `v8`.
 
 ## Performance
 
-Between `v1` and `v7`, I managed to achieve:
+Between `v1` and `v8`, I managed to achieve:
 
-* 97.69% drop in execution time from 148.46 seconds to just 3.4 seconds!
+* 97.92% drop in execution time from 148.46 seconds to just 3.08 seconds!
 * 99.31% drop in the memory from ~45GB to just 321MB.
 * More than 100% drop in allocations from 2GB per operation to just 11kb per operation.
 
