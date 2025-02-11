@@ -14,6 +14,7 @@ This is my attempt of the famous [challenge](https://github.com/gunnarmorling/1b
 |v6|5.7s| Reduce `map` access by using pointers.                                            |
 |v7|3.2s| Replace `map` with a custom hash bucket using the `fnv` hash                      |
 |v8|3.08s| Use PGO to generate optimised binary.                                             | 
+
 Detailed benchmarks are included in the `benchmarks` folder.
 
 ## Running the program
