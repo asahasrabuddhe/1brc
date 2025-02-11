@@ -3,6 +3,8 @@ package onebrc
 import (
 	"bytes"
 	"iter"
+	"strings"
+	"unsafe"
 )
 
 // hashBucket implementation
@@ -42,7 +44,7 @@ func (it items) Less(i, j int) bool {
 		return true
 	}
 
-	return bytes.Compare(it[i].key, it[j].key) < 0
+	return strings.Compare(b2s(it[i].key), b2s(it[j].key)) < 0
 }
 
 func (it items) Swap(i, j int) {
@@ -110,4 +112,8 @@ func (b *hashBucket) getItems() iter.Seq2[uint64, item] {
 			}
 		}
 	}
+}
+
+func b2s(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }

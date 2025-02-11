@@ -26,7 +26,7 @@ func (_ V8) Process(in *os.File, out io.Writer) error {
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV7(in.Name(), chunk, resultsCh, &chunkWg)
+		go processChunkV8(in.Name(), chunk, resultsCh, &chunkWg)
 	}
 
 	// wait for all the goroutines to finish
@@ -85,7 +85,7 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 	offset := int64(0)
 	buf := make([]byte, maxLineLength)
 
-	for i := 0; i < numChunks; i++ {
+	for i := range numChunks {
 		if offset >= size {
 			break
 		}
@@ -100,15 +100,11 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 
 		// Seek to the target offset, minus a buffer to find the nearest newline
 		seekOffset := max(end-maxLineLength, 0)
-		//_, err = f.Seek(seekOffset, io.SeekStart)
-		//if err != nil {
-		//	return nil, err
-		//}
 
 		// Read up to `maxLineLength` bytes
-		n, err := f.ReadAt(buf, seekOffset)
-		if err != nil && !errors.Is(err, io.EOF) {
-			return nil, err
+		n, readErr := f.ReadAt(buf, seekOffset)
+		if readErr != nil && !errors.Is(readErr, io.EOF) {
+			return nil, readErr
 		}
 
 		// Find the nearest newline
@@ -126,4 +122,82 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 	}
 
 	return chunks, nil
+}
+
+func processChunkV8(filePath string, md metadata, resultsCh chan *hashBucket, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	reader := io.NewSectionReader(file, md.offset, md.size)
+	results := newBucket()
+
+	buf := make([]byte, BufferSize)
+	readStart := 0
+	for {
+		n, readErr := reader.Read(buf[readStart:])
+		if readErr != nil && !errors.Is(readErr, io.EOF) {
+			panic(readErr)
+		}
+		if readStart+n == 0 {
+			break
+		}
+
+		chunk := buf[:readStart+n]
+		newline := lastByteIndex(chunk, '\n')
+		if newline < 0 {
+			break
+		}
+
+		remaining := chunk[newline+1:]
+		chunk = chunk[:newline+1]
+
+		for {
+			var stationName []byte
+			hash := uint64(offset64)
+			for i := range len(chunk) {
+				c := chunk[i]
+				if c == ';' {
+					stationName, chunk = chunk[:i], chunk[i+1:]
+					break
+				}
+				hash *= prime64
+				hash ^= uint64(c) // FNV-1 is * then XOR
+			}
+			if len(chunk) == 0 {
+				break
+			}
+			// Parse temperature.
+			var (
+				isNeg bool
+				temp  int64
+				index int
+			)
+			if chunk[0] == '-' {
+				isNeg = true
+				index++
+			}
+			for ; index < len(chunk); index++ {
+				if chunk[index] == '\n' {
+					index++
+					chunk = chunk[index:]
+					break
+				}
+				if chunk[index] == '.' {
+					index++
+				}
+				temp = temp*10 + int64(chunk[index]-'0')
+			}
+			if isNeg {
+				temp = -temp
+			}
+			results.insertItem(stationName, hash, temp, temp, temp, 1)
+		}
+		readStart = copy(buf, remaining)
+	}
+	resultsCh <- results
 }

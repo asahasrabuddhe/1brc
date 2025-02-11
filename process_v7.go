@@ -103,12 +103,12 @@ func processChunkV7(filePath string, md metadata, resultsCh chan *hashBucket, wg
 		chunk = chunk[:newline+1]
 
 		for {
-			var stationName, temp []byte
+			var stationName []byte
 			hash := uint64(offset64)
-			for i := 0; i < len(chunk); i++ {
+			for i := range len(chunk) {
 				c := chunk[i]
 				if c == ';' {
-					stationName, temp = chunk[:i], chunk[i+1:]
+					stationName, chunk = chunk[:i], chunk[i+1:]
 					break
 				}
 				hash *= prime64
@@ -119,28 +119,29 @@ func processChunkV7(filePath string, md metadata, resultsCh chan *hashBucket, wg
 			}
 			// Parse temperature.
 			var (
-				isNeg   bool
-				tempInt int64
+				isNeg bool
+				temp  int64
+				index int
 			)
-			for index := 0; index < len(temp); index++ {
-				if temp[index] == '\n' {
+			if chunk[0] == '-' {
+				isNeg = true
+				index++
+			}
+			for ; index < len(chunk); index++ {
+				if chunk[index] == '\n' {
 					index++
-					chunk = temp[index:]
+					chunk = chunk[index:]
 					break
 				}
-				if temp[index] == '-' {
-					isNeg = true
-					continue
+				if chunk[index] == '.' {
+					index++
 				}
-				if temp[index] == '.' {
-					continue
-				}
-				tempInt = tempInt*10 + int64(temp[index]-'0')
+				temp = temp*10 + int64(chunk[index]-'0')
 			}
 			if isNeg {
-				tempInt = -tempInt
+				temp = -temp
 			}
-			results.insertItem(stationName, hash, tempInt, tempInt, tempInt, 1)
+			results.insertItem(stationName, hash, temp, temp, temp, 1)
 		}
 		readStart = copy(buf, remaining)
 	}

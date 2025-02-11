@@ -8,4 +8,4 @@ test:
 	go test ./...
 
 bench:
-	go test -timeout=30m -count=10 -bench=BenchmarkProcess${VERSION_UPPER} -benchmem -o=profiles/${VERSION_LOWER}.test -cpuprofile=profiles/${VERSION_UPPER}.out | tee benchmarks/${VERSION_LOWER}.txt
+	go test -timeout=30m -count=10 -bench=BenchmarkProcess${VERSION_UPPER} -benchmem -o=profiles/${VERSION_LOWER}.test -cpuprofile=profiles/${VERSION_LOWERgo}.out | tee benchmarks/${VERSION_LOWER}.txt
