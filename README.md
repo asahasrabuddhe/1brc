@@ -1,6 +1,6 @@
 # One Billion Row Challenge - Go
 
-This is my attempt of the famous [challenge](https://github.com/gunnarmorling/1brc) which was initally announced in January 2024. I went through 7 iterations to get to my current best time.
+This is my attempt of the famous [challenge](https://github.com/gunnarmorling/1brc) which was initally announced in January 2024. I went through 8 iterations to get to my current best time.
 
 ## Timings
 
