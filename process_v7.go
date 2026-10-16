@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sort"
+	"slices"
 	"sync"
 )
 
@@ -50,7 +50,7 @@ func (_ V7) Process(in *os.File, out io.Writer) error {
 	}
 
 	// sort the results by station name
-	sort.Sort(results.items)
+	slices.SortFunc(results.items, compareItems)
 
 	_, _ = fmt.Fprint(out, "{")
 	idx := 0
