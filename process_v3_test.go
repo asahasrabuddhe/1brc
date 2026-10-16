@@ -11,7 +11,7 @@ import (
 func BenchmarkProcessV3(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
-		b.Error(err)
+		b.Fatal(err)
 	}
 
 	defer file.Close()

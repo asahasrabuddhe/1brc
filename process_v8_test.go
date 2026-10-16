@@ -12,7 +12,7 @@ import (
 func BenchmarkProcessV8(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
-		b.Error(err)
+		b.Fatal(err)
 	}
 
 	defer file.Close()
@@ -79,7 +79,7 @@ func Test_splitChunksV8(t *testing.T) {
 func Benchmark_splitChunksV8(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
-		b.Error(err)
+		b.Fatal(err)
 	}
 
 	defer file.Close()

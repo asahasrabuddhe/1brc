@@ -91,7 +91,7 @@ func Test_Process(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			file, err := os.Open(tt.args.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			p := NewProcess(tt.args.version)
 			out := &bytes.Buffer{}
