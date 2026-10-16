@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
+	"slices"
 )
 
 type DataV4 struct {
@@ -86,7 +86,7 @@ func (_ V4) Process(in *os.File, out io.Writer) error {
 		}
 		readStart = copy(buf, remaining)
 	}
-	sort.Strings(stations)
+	slices.Sort(stations)
 	fmt.Fprint(out, "{")
 	for i, name := range stations {
 		if i > 0 {

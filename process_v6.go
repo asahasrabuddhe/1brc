@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sort"
+	"slices"
 	"sync"
 )
 
@@ -57,7 +57,7 @@ func (_ V6) Process(in *os.File, out io.Writer) error {
 		}
 	}
 
-	sort.Strings(stations)
+	slices.Sort(stations)
 	fmt.Fprint(out, "{")
 	for i, name := range stations {
 		if i > 0 {
