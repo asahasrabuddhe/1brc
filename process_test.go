@@ -78,6 +78,14 @@ func Test_Process(t *testing.T) {
 			},
 			wantOut: wantOut,
 		},
+		{
+			name: "V8",
+			args: args{
+				filePath: filePath,
+				version:  "v8",
+			},
+			wantOut: wantOut,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
