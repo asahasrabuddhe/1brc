@@ -2,6 +2,8 @@
 
 This is my attempt of the famous [challenge](https://github.com/gunnarmorling/1brc) which was initally announced in January 2024. I went through 8 iterations to get to my current best time.
 
+The code targets Go 1.27. The timings below were measured on an earlier toolchain.
+
 ## Timings
 
 |Version|Time| Implementation Details                                                            |
