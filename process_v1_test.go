@@ -19,6 +19,9 @@ func BenchmarkProcessV1(b *testing.B) {
 	var out bytes.Buffer
 
 	for b.Loop() {
+		if _, err := file.Seek(0, io.SeekStart); err != nil {
+			b.Fatal(err)
+		}
 		p := V1{}
 		out = bytes.Buffer{}
 		err = p.Process(file, &out)
