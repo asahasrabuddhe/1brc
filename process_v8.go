@@ -12,7 +12,7 @@ import (
 
 type V8 struct{}
 
-func (_ V8) Process(in *os.File, out io.Writer) error {
+func (V8) Process(in *os.File, out io.Writer) error {
 	results := newBucket()
 	resultsCh := make(chan *hashBucket)
 
@@ -78,7 +78,7 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 	// Calculate the ideal chunk size
 	chunkSize := size / int64(numChunks)
 	if chunkSize == 0 {
-		return nil, fmt.Errorf("chunk size too small for the number of chunks")
+		return nil, errors.New("chunk size too small for the number of chunks")
 	}
 
 	// Slice to store chunk metadata

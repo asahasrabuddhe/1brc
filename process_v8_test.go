@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -69,7 +69,7 @@ func Test_splitChunksV8(t *testing.T) {
 				t.Errorf("splitChunksV8() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !slices.Equal(got, tt.want) {
 				t.Errorf("splitChunksV8() got = %v, want %v", got, tt.want)
 			}
 		})

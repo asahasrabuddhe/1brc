@@ -18,7 +18,7 @@ type DataV4 struct {
 
 type V4 struct{}
 
-func (_ V4) Process(in *os.File, out io.Writer) error {
+func (V4) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV4)
 	stations := make([]string, 0)
 	buf := make([]byte, BufferSize)

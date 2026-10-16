@@ -18,7 +18,7 @@ const (
 
 type V7 struct{}
 
-func (_ V7) Process(in *os.File, out io.Writer) error {
+func (V7) Process(in *os.File, out io.Writer) error {
 	results := newBucket()
 	resultsCh := make(chan *hashBucket)
 

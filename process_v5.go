@@ -13,7 +13,7 @@ import (
 
 type V5 struct{}
 
-func (_ V5) Process(in *os.File, out io.Writer) error {
+func (V5) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV4)
 	resultsCh := make(chan map[string]DataV4)
 	stations := make([]string, 0)
@@ -100,7 +100,7 @@ func splitChunks(filePath string, numChunks int) ([]metadata, error) {
 	// Calculate the ideal chunk size
 	chunkSize := size / int64(numChunks)
 	if chunkSize == 0 {
-		return nil, fmt.Errorf("chunk size too small for the number of chunks")
+		return nil, errors.New("chunk size too small for the number of chunks")
 	}
 
 	// Slice to store chunk metadata

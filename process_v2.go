@@ -12,7 +12,7 @@ import (
 
 type V2 struct{}
 
-func (_ V2) Process(in *os.File, out io.Writer) error {
+func (V2) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV1)
 	stations := make([]string, 0)
 	scanner := bufio.NewScanner(in)

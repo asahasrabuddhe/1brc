@@ -13,7 +13,7 @@ import (
 
 type V6 struct{}
 
-func (_ V6) Process(in *os.File, out io.Writer) error {
+func (V6) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]*DataV4)
 	resultsCh := make(chan map[string]*DataV4)
 	stations := make([]string, 0)
