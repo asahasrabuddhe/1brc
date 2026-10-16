@@ -11,6 +11,7 @@ import (
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Println("Usage: 1brc <filename> <version>")
+		os.Exit(1)
 	}
 
 	filename := os.Args[1]
