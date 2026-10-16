@@ -13,6 +13,7 @@ const numBuckets = 1 << 11 // number of hash buckets (power of 2)
 // item represents a key-value pair in the hashBucket.
 type item struct {
 	key   []byte
+	hash  uint64
 	value *DataV4
 }
 
@@ -71,7 +72,8 @@ func (b *hashBucket) insertItem(stationName []byte, hash uint64, minTemp, maxTem
 			key := make([]byte, len(stationName))
 			copy(key, stationName)
 			b.items[hashIndex] = item{
-				key: key,
+				key:  key,
+				hash: hash,
 				value: &DataV4{
 					Min:   minTemp,
 					Max:   maxTemp,
@@ -104,9 +106,9 @@ func (b *hashBucket) insertItem(stationName []byte, hash uint64, minTemp, maxTem
 
 func (b *hashBucket) getItems() iter.Seq2[uint64, item] {
 	return func(yield func(uint64, item) bool) {
-		for hi, i := range b.items {
+		for _, i := range b.items {
 			if i.value != nil {
-				if !yield(uint64(hi), i) {
+				if !yield(i.hash, i) {
 					return
 				}
 			}
