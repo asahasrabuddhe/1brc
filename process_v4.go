@@ -50,7 +50,7 @@ func (_ V4) Process(in *os.File, out io.Writer) error {
 			name, tempBytes := string(line[:sepIndex]), line[sepIndex+1:]
 			var temp int64
 			var isNeg bool
-			for idx := 0; idx < len(tempBytes); idx++ {
+			for idx := range tempBytes {
 				if tempBytes[idx] == '\n' {
 					break
 				}

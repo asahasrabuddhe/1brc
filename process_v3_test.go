@@ -18,7 +18,7 @@ func BenchmarkProcessV3(b *testing.B) {
 
 	var out bytes.Buffer
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		p := V3{}
 		out = bytes.Buffer{}
 		err = p.Process(file, &out)

@@ -19,7 +19,7 @@ func BenchmarkProcessV8(b *testing.B) {
 
 	var out bytes.Buffer
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		p := V8{}
 		out = bytes.Buffer{}
 		err = p.Process(file, &out)
@@ -86,7 +86,7 @@ func Benchmark_splitChunksV8(b *testing.B) {
 
 	var chunks []metadata
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		chunks, err = splitChunksV8("./testdata/measurements-10k.txt", 10)
 		if err != nil {
 			b.Error(err)

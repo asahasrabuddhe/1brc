@@ -23,11 +23,12 @@ func (_ V6) Process(in *os.File, out io.Writer) error {
 	}
 	// chunkWg is used to wait for all the goroutines to finish
 	var chunkWg sync.WaitGroup
-	chunkWg.Add(len(chunks))
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV6(in.Name(), chunk, resultsCh, &chunkWg)
+		chunkWg.Go(func() {
+			processChunkV6(in.Name(), chunk, resultsCh)
+		})
 	}
 
 	// wait for all the goroutines to finish
@@ -70,9 +71,7 @@ func (_ V6) Process(in *os.File, out io.Writer) error {
 	return nil
 }
 
-func processChunkV6(filePath string, md metadata, resultsCh chan map[string]*DataV4, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func processChunkV6(filePath string, md metadata, resultsCh chan map[string]*DataV4) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)

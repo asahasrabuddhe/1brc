@@ -22,11 +22,12 @@ func (_ V8) Process(in *os.File, out io.Writer) error {
 	}
 	// chunkWg is used to wait for all the goroutines to finish
 	var chunkWg sync.WaitGroup
-	chunkWg.Add(len(chunks))
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV8(in.Name(), chunk, resultsCh, &chunkWg)
+		chunkWg.Go(func() {
+			processChunkV8(in.Name(), chunk, resultsCh)
+		})
 	}
 
 	// wait for all the goroutines to finish
@@ -124,9 +125,7 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 	return chunks, nil
 }
 
-func processChunkV8(filePath string, md metadata, resultsCh chan *hashBucket, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func processChunkV8(filePath string, md metadata, resultsCh chan *hashBucket) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
