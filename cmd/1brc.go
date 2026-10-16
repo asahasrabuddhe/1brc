@@ -38,7 +38,7 @@ func main() {
 	}
 
 	timeElapsed := time.Since(now)
-	fmt.Printf("Proecssed %d MB in %s @ %.2f MB/s\n", size, timeElapsed.String(), float64(size)/timeElapsed.Seconds())
+	fmt.Printf("Processed %d MB in %s @ %.2f MB/s\n", size, timeElapsed.String(), float64(size)/timeElapsed.Seconds())
 
 	err = file.Close()
 	if err != nil {
