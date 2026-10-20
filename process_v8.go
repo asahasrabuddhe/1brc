@@ -6,13 +6,13 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sort"
+	"slices"
 	"sync"
 )
 
 type V8 struct{}
 
-func (_ V8) Process(in *os.File, out io.Writer) error {
+func (V8) Process(in *os.File, out io.Writer) error {
 	results := newBucket()
 	resultsCh := make(chan *hashBucket)
 
@@ -22,11 +22,12 @@ func (_ V8) Process(in *os.File, out io.Writer) error {
 	}
 	// chunkWg is used to wait for all the goroutines to finish
 	var chunkWg sync.WaitGroup
-	chunkWg.Add(len(chunks))
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV8(in.Name(), chunk, resultsCh, &chunkWg)
+		chunkWg.Go(func() {
+			processChunkV8(in.Name(), chunk, resultsCh)
+		})
 	}
 
 	// wait for all the goroutines to finish
@@ -43,7 +44,7 @@ func (_ V8) Process(in *os.File, out io.Writer) error {
 	}
 
 	// sort the results by station name
-	sort.Sort(results.items)
+	slices.SortFunc(results.items, compareItems)
 
 	_, _ = fmt.Fprint(out, "{")
 	idx := 0
@@ -77,7 +78,7 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 	// Calculate the ideal chunk size
 	chunkSize := size / int64(numChunks)
 	if chunkSize == 0 {
-		return nil, fmt.Errorf("chunk size too small for the number of chunks")
+		return nil, errors.New("chunk size too small for the number of chunks")
 	}
 
 	// Slice to store chunk metadata
@@ -124,9 +125,7 @@ func splitChunksV8(filePath string, numChunks int) ([]metadata, error) {
 	return chunks, nil
 }
 
-func processChunkV8(filePath string, md metadata, resultsCh chan *hashBucket, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func processChunkV8(filePath string, md metadata, resultsCh chan *hashBucket) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)

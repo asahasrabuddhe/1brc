@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
+	"slices"
 )
 
 type DataV4 struct {
@@ -18,7 +18,7 @@ type DataV4 struct {
 
 type V4 struct{}
 
-func (_ V4) Process(in *os.File, out io.Writer) error {
+func (V4) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV4)
 	stations := make([]string, 0)
 	buf := make([]byte, BufferSize)
@@ -50,7 +50,7 @@ func (_ V4) Process(in *os.File, out io.Writer) error {
 			name, tempBytes := string(line[:sepIndex]), line[sepIndex+1:]
 			var temp int64
 			var isNeg bool
-			for idx := 0; idx < len(tempBytes); idx++ {
+			for idx := range tempBytes {
 				if tempBytes[idx] == '\n' {
 					break
 				}
@@ -86,7 +86,7 @@ func (_ V4) Process(in *os.File, out io.Writer) error {
 		}
 		readStart = copy(buf, remaining)
 	}
-	sort.Strings(stations)
+	slices.Sort(stations)
 	fmt.Fprint(out, "{")
 	for i, name := range stations {
 		if i > 0 {

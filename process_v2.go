@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 )
 
 type V2 struct{}
 
-func (_ V2) Process(in *os.File, out io.Writer) error {
+func (V2) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV1)
 	stations := make([]string, 0)
 	scanner := bufio.NewScanner(in)
@@ -41,7 +41,7 @@ func (_ V2) Process(in *os.File, out io.Writer) error {
 			results[name] = data
 		}
 	}
-	sort.Strings(stations)
+	slices.Sort(stations)
 	fmt.Fprint(out, "{")
 	for i, name := range stations {
 		if i > 0 {

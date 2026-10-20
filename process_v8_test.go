@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"reflect"
+	"slices"
 	"testing"
 )
 
 func BenchmarkProcessV8(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
-		b.Error(err)
+		b.Fatal(err)
 	}
 
 	defer file.Close()
 
 	var out bytes.Buffer
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		p := V8{}
 		out = bytes.Buffer{}
 		err = p.Process(file, &out)
@@ -69,7 +69,7 @@ func Test_splitChunksV8(t *testing.T) {
 				t.Errorf("splitChunksV8() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !slices.Equal(got, tt.want) {
 				t.Errorf("splitChunksV8() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -79,14 +79,14 @@ func Test_splitChunksV8(t *testing.T) {
 func Benchmark_splitChunksV8(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
-		b.Error(err)
+		b.Fatal(err)
 	}
 
 	defer file.Close()
 
 	var chunks []metadata
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		chunks, err = splitChunksV8("./testdata/measurements-10k.txt", 10)
 		if err != nil {
 			b.Error(err)

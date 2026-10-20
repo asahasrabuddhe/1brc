@@ -3,8 +3,6 @@ package onebrc
 import (
 	"bytes"
 	"iter"
-	"strings"
-	"unsafe"
 )
 
 // hashBucket implementation
@@ -13,42 +11,23 @@ const numBuckets = 1 << 11 // number of hash buckets (power of 2)
 // item represents a key-value pair in the hashBucket.
 type item struct {
 	key   []byte
+	hash  uint64
 	value *DataV4
 }
 
 type items []item
 
-func (it items) Len() int {
-	return len(it)
-}
-
-func (it items) Less(i, j int) bool {
-	// keep nil where it is
-	if it[i].value == nil {
-		return false
+// compareItems orders items by key, with empty slots last.
+func compareItems(a, b item) int {
+	switch {
+	case a.value == nil && b.value == nil:
+		return 0
+	case a.value == nil:
+		return 1
+	case b.value == nil:
+		return -1
 	}
-	// move nil to the end
-	if it[j].value == nil {
-		return true
-	}
-	// merge duplicates i and j and set j to nil
-	if bytes.Equal(it[i].key, it[j].key) {
-		it[i].value.Min = min(it[i].value.Min, it[j].value.Min)
-		it[i].value.Max = max(it[i].value.Max, it[j].value.Max)
-		it[i].value.Total += it[j].value.Total
-		it[i].value.Count += it[j].value.Count
-		it[j].value = nil
-
-		it.Swap(i, j)
-
-		return true
-	}
-
-	return strings.Compare(b2s(it[i].key), b2s(it[j].key)) < 0
-}
-
-func (it items) Swap(i, j int) {
-	it[i], it[j] = it[j], it[i]
+	return bytes.Compare(a.key, b.key)
 }
 
 // hashBucket is a hash table with linear probing.
@@ -71,7 +50,8 @@ func (b *hashBucket) insertItem(stationName []byte, hash uint64, minTemp, maxTem
 			key := make([]byte, len(stationName))
 			copy(key, stationName)
 			b.items[hashIndex] = item{
-				key: key,
+				key:  key,
+				hash: hash,
 				value: &DataV4{
 					Min:   minTemp,
 					Max:   maxTemp,
@@ -104,16 +84,12 @@ func (b *hashBucket) insertItem(stationName []byte, hash uint64, minTemp, maxTem
 
 func (b *hashBucket) getItems() iter.Seq2[uint64, item] {
 	return func(yield func(uint64, item) bool) {
-		for hi, i := range b.items {
+		for _, i := range b.items {
 			if i.value != nil {
-				if !yield(uint64(hi), i) {
+				if !yield(i.hash, i) {
 					return
 				}
 			}
 		}
 	}
-}
-
-func b2s(b []byte) string {
-	return *(*string)(unsafe.Pointer(&b))
 }

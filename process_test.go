@@ -78,12 +78,20 @@ func Test_Process(t *testing.T) {
 			},
 			wantOut: wantOut,
 		},
+		{
+			name: "V8",
+			args: args{
+				filePath: filePath,
+				version:  "v8",
+			},
+			wantOut: wantOut,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			file, err := os.Open(tt.args.filePath)
 			if err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			p := NewProcess(tt.args.version)
 			out := &bytes.Buffer{}

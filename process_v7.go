@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sort"
+	"slices"
 	"sync"
 )
 
@@ -18,7 +18,7 @@ const (
 
 type V7 struct{}
 
-func (_ V7) Process(in *os.File, out io.Writer) error {
+func (V7) Process(in *os.File, out io.Writer) error {
 	results := newBucket()
 	resultsCh := make(chan *hashBucket)
 
@@ -28,11 +28,12 @@ func (_ V7) Process(in *os.File, out io.Writer) error {
 	}
 	// chunkWg is used to wait for all the goroutines to finish
 	var chunkWg sync.WaitGroup
-	chunkWg.Add(len(chunks))
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV7(in.Name(), chunk, resultsCh, &chunkWg)
+		chunkWg.Go(func() {
+			processChunkV7(in.Name(), chunk, resultsCh)
+		})
 	}
 
 	// wait for all the goroutines to finish
@@ -49,7 +50,7 @@ func (_ V7) Process(in *os.File, out io.Writer) error {
 	}
 
 	// sort the results by station name
-	sort.Sort(results.items)
+	slices.SortFunc(results.items, compareItems)
 
 	_, _ = fmt.Fprint(out, "{")
 	idx := 0
@@ -65,9 +66,7 @@ func (_ V7) Process(in *os.File, out io.Writer) error {
 	return nil
 }
 
-func processChunkV7(filePath string, md metadata, resultsCh chan *hashBucket, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func processChunkV7(filePath string, md metadata, resultsCh chan *hashBucket) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)

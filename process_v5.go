@@ -7,13 +7,13 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"sort"
+	"slices"
 	"sync"
 )
 
 type V5 struct{}
 
-func (_ V5) Process(in *os.File, out io.Writer) error {
+func (V5) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV4)
 	resultsCh := make(chan map[string]DataV4)
 	stations := make([]string, 0)
@@ -23,11 +23,12 @@ func (_ V5) Process(in *os.File, out io.Writer) error {
 	}
 	// chunkWg is used to wait for all the goroutines to finish
 	var chunkWg sync.WaitGroup
-	chunkWg.Add(len(chunks))
 
 	// process each chunk in a separate goroutine
 	for _, chunk := range chunks {
-		go processChunkV5(in.Name(), chunk, resultsCh, &chunkWg)
+		chunkWg.Go(func() {
+			processChunkV5(in.Name(), chunk, resultsCh)
+		})
 	}
 
 	// wait for all the goroutines to finish
@@ -58,7 +59,7 @@ func (_ V5) Process(in *os.File, out io.Writer) error {
 		}
 	}
 
-	sort.Strings(stations)
+	slices.Sort(stations)
 	fmt.Fprint(out, "{")
 	for i, name := range stations {
 		if i > 0 {
@@ -99,7 +100,7 @@ func splitChunks(filePath string, numChunks int) ([]metadata, error) {
 	// Calculate the ideal chunk size
 	chunkSize := size / int64(numChunks)
 	if chunkSize == 0 {
-		return nil, fmt.Errorf("chunk size too small for the number of chunks")
+		return nil, errors.New("chunk size too small for the number of chunks")
 	}
 
 	// Slice to store chunk metadata
@@ -107,7 +108,7 @@ func splitChunks(filePath string, numChunks int) ([]metadata, error) {
 	offset := int64(0)
 	buf := make([]byte, maxLineLength)
 
-	for i := 0; i < numChunks; i++ {
+	for i := range numChunks {
 		if offset >= size {
 			break
 		}
@@ -150,9 +151,7 @@ func splitChunks(filePath string, numChunks int) ([]metadata, error) {
 	return chunks, nil
 }
 
-func processChunkV5(filePath string, md metadata, resultsCh chan map[string]DataV4, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func processChunkV5(filePath string, md metadata, resultsCh chan map[string]DataV4) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
+	"slices"
 	"strconv"
 )
 
@@ -14,7 +14,7 @@ const BufferSize = 32 * 1024 * 1024
 
 type V3 struct{}
 
-func (_ V3) Process(in *os.File, out io.Writer) error {
+func (V3) Process(in *os.File, out io.Writer) error {
 	results := make(map[string]DataV1)
 	stations := make([]string, 0)
 	buf := make([]byte, BufferSize)
@@ -68,7 +68,7 @@ func (_ V3) Process(in *os.File, out io.Writer) error {
 		}
 		readStart = copy(buf, remaining)
 	}
-	sort.Strings(stations)
+	slices.Sort(stations)
 	fmt.Fprint(out, "{")
 	for i, name := range stations {
 		if i > 0 {

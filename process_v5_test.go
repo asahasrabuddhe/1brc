@@ -11,14 +11,14 @@ import (
 func BenchmarkProcessV5(b *testing.B) {
 	file, err := os.Open("./testdata/measurements.txt")
 	if err != nil {
-		b.Error(err)
+		b.Fatal(err)
 	}
 
 	defer file.Close()
 
 	var out bytes.Buffer
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		p := V5{}
 		out = bytes.Buffer{}
 		err = p.Process(file, &out)

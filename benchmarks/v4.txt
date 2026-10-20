@@ -1,16 +1,11 @@
 goos: darwin
 goarch: arm64
 pkg: onebrc
-cpu: Apple M1 Pro
-BenchmarkProcessV4-10    	       1	78175583083 ns/op	9861534624 B/op	1000001751 allocs/op
-BenchmarkProcessV4-10    	       1	78248847167 ns/op	9861490360 B/op	1000001750 allocs/op
-BenchmarkProcessV4-10    	       1	78822774833 ns/op	9861511336 B/op	1000001757 allocs/op
-BenchmarkProcessV4-10    	       1	78613871625 ns/op	9861479640 B/op	1000001738 allocs/op
-BenchmarkProcessV4-10    	       1	78930345667 ns/op	9861500248 B/op	1000001763 allocs/op
-BenchmarkProcessV4-10    	       1	79424744834 ns/op	9861481368 B/op	1000001756 allocs/op
-BenchmarkProcessV4-10    	       1	78999297875 ns/op	9861482824 B/op	1000001763 allocs/op
-BenchmarkProcessV4-10    	       1	78048868458 ns/op	9861489720 B/op	1000001756 allocs/op
-BenchmarkProcessV4-10    	       1	78364998084 ns/op	9861491432 B/op	1000001768 allocs/op
-BenchmarkProcessV4-10    	       1	78620026166 ns/op	9861484040 B/op	1000001756 allocs/op
+cpu: Apple M5 Max
+BenchmarkProcessV4-18    	       1	38918827917 ns/op	9861538096 B/op	1000001709 allocs/op
+BenchmarkProcessV4-18    	       1	37804794583 ns/op	9861487872 B/op	1000001696 allocs/op
+BenchmarkProcessV4-18    	       1	38437747042 ns/op	9861504240 B/op	1000001701 allocs/op
+BenchmarkProcessV4-18    	       1	37819125041 ns/op	9861488080 B/op	1000001700 allocs/op
+BenchmarkProcessV4-18    	       1	38520099167 ns/op	9861506544 B/op	1000001701 allocs/op
 PASS
-ok  	onebrc	787.095s
+ok  	onebrc	192.845s
